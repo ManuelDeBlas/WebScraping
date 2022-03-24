@@ -11,6 +11,14 @@ class BookScraper():
 
         self.url = "https://www.todostuslibros.com/mas_vendidos"
         
+    
+    def _get_number_of_pages(self, html):
+        """
+        Gets the number of web pages
+        """
+        # TODO. sin acabar
+        number_of_pages = html.find(class_="pagination")
+        
 
 
     def _get_html(self, url):
@@ -29,7 +37,7 @@ class BookScraper():
 
     def _get_books(self, soup):
         """
-        Extracts the information for all books.
+        Extracts the information from all books.
         """
         book_info = dict()
         books = soup.find_all(class_="book row")
@@ -38,7 +46,13 @@ class BookScraper():
             self._generate_unique_id()
             book_info = {"id": self._id,
                          "title": self._get_title(book),
-                         "subtitle": self._get_subtitle(book) }
+                         "subtitle": self._get_subtitle(book),
+                         "author": self._get_author(book),
+                         "synopsis": self._get_synopsis(book),
+                         "editorial": self._get_editorial(book),
+                         "ISBN": self._get_ISBN(book),
+                         "price": self._get_price(book),
+                         "price without taxes": self._get_price_no_taxes(book)}
 
             self._dt.append(book_info)
 
@@ -50,7 +64,7 @@ class BookScraper():
 
     def _get_title(self, book):
         """
-        Extracts the book title and gives it format
+        Extracts the book title and gives it format.
         """
         title = book.find(class_="title").contents[1].contents[0]
         # TODO: '\n                        El castillo de Barbazul\n                        ' <- tratar el formato
@@ -59,7 +73,7 @@ class BookScraper():
 
     def _get_subtitle(self, book):
         """
-        Extracts the book subtitle
+        Extracts the book subtitle.
         """
         # There might be no subtitles
         try:
@@ -68,6 +82,58 @@ class BookScraper():
             subtitle = ""
         # TODO: Inspenccionar si hace falta tratar el formato
         return subtitle
+
+    
+    def _get_author(self, book):
+        """
+        Extracts the book author.
+        """
+        return book.find(class_="author").contents[0].contents[0]
+    
+    
+    def _get_synopsis(self, book):
+        """
+        Extracts the book synopsis.
+        """
+        # TODO: Hay 2 sinopsis diferentes. Ambas aparecen incompletas. Quizás haya que buscar en la página de cada libro
+        return book.find(class_="synopsis d-none d-md-block d-lg-block d-xl-block").contents[0]
+    
+    
+    def _get_editorial_and_ISBN(self, book):
+        """
+        Returns the editorial and the ISBN in a list.
+        """
+        return book.find(class_="data").contents[0].split("/")
+    
+    
+    def _get_editorial(self,book):
+        """
+        Extracts the editorial.
+        """
+        return self._get_editorial_and_ISBN(book)[0]
+    
+    
+    def _get_ISBN(self, book):
+        """
+        Extracts the ISBN.
+        """
+        return self._get_editorial_and_ISBN(book)[1].strip()
+    
+    
+    def _get_price(self, book):
+        """
+        Extracts the book price.
+        """
+        # TODO: El formato sale con muchos espacios.
+        return book.find(class_="book-price").contents[1].contents[0]
+    
+    
+    def _get_price_no_taxes(self, book):
+        """
+        Extracts the book price without taxes.
+        """
+        # TODO: El formato sale con muchos espacios.
+        return book.find(class_="book-price").contents[2]
 
 
     def scrape(self):
@@ -79,11 +145,18 @@ class BookScraper():
 
         # Start timer
         start_time = time.time()
+        
+        # Get number of pages
+        # TODO. Sin acabar
+        url_page = self._get_url_page(1)
+        html_page = self._get_html(url_page)
+        soup = BeautifulSoup(html_page.content, features="html.parser")
+        number_of_pages = self._get_number_of_pages(soup)
 
         # Loop through all pages
-        for p in range(1, 11):
+        for page in range(1, 11):
             
-            url_page = self._get_url_page(p)
+            url_page = self._get_url_page(page)
             html_page = self._get_html(url_page)
             soup = BeautifulSoup(html_page.content, features="html.parser")
             self._get_books(soup)
