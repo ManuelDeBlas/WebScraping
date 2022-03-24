@@ -1,4 +1,4 @@
-from src.scraper import BookScraper
+from scraper import BookScraper
 
 output_file = "casadellibro.csv"
 
