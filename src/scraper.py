@@ -23,7 +23,7 @@ class BookScraper():
         """
         Extracts the information about the books in a page.
         """
-        return soup.find(class_="row bestsellers featured-books books")
+        return soup.find(class_="books")
     
     def scrape(self):
         """
@@ -34,12 +34,20 @@ class BookScraper():
         # Start timer
         start_time = time.time()
 
-        for p in range(1, 10):
+        books_list = []
+
+        for p in range(0, 10):
             
             url_page = self.__get_url_page(p)
             html_page = self.__get_html(url_page)
             soup = BeautifulSoup(html_page.content)
             books = self.__get_books(soup)
+            book = books.find(class_="book row")
+            books_list.append(book)
+
+            for b in range(1, 10):
+                books_list.append(book.find_next_sibling())
+                book = book.find_next_sibling()
 
     def data2csv(self, output_file):
         """
