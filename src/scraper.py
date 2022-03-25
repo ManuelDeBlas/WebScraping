@@ -171,3 +171,4 @@ class BookScraper():
             writer = csv.DictWriter(csvfile, fieldnames = self._dt[0].keys())
             writer.writeheader()
             writer.writerows(self._dt)
+            # TODO, sale el siguiente error: 'charmap' codec can't encode character '\u2212' in position 365: character maps to <undefined>
