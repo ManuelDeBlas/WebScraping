@@ -1,6 +1,6 @@
 from scraper import BookScraper
 
-output_file = "test.csv"
+output_file = "output/test.csv"
 
 scraper = BookScraper()
 scraper.scrape()
