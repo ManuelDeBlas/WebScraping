@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import csv
+import re
 
 class BookScraper():
 
@@ -67,8 +68,9 @@ class BookScraper():
         Extracts the book title and gives it format.
         """
         title = book.find(class_="title").contents[1].contents[0]
+        title = self._format_field(title)
         # TODO: '\n                        El castillo de Barbazul\n                        ' <- tratar el formato
-        return title
+        return title.encode("utf-8")
 
 
     def _get_subtitle(self, book):
@@ -81,14 +83,14 @@ class BookScraper():
         except:
             subtitle = ""
         # TODO: Inspenccionar si hace falta tratar el formato
-        return subtitle
+        return subtitle.encode("utf-8")
 
     
     def _get_author(self, book):
         """
         Extracts the book author.
         """
-        return book.find(class_="author").contents[0].contents[0]
+        return book.find(class_="author").contents[0].contents[0].encode("utf-8")
     
     
     def _get_synopsis(self, book):
@@ -96,7 +98,7 @@ class BookScraper():
         Extracts the book synopsis.
         """
         # TODO: Hay 2 sinopsis diferentes. Ambas aparecen incompletas. Quizás haya que buscar en la página de cada libro
-        return book.find(class_="synopsis d-none d-md-block d-lg-block d-xl-block").contents[0]
+        return book.find(class_="synopsis d-none d-md-block d-lg-block d-xl-block").contents[0].encode("utf-8")
     
     
     def _get_editorial_and_ISBN(self, book):
@@ -110,14 +112,14 @@ class BookScraper():
         """
         Extracts the editorial.
         """
-        return self._get_editorial_and_ISBN(book)[0]
+        return self._get_editorial_and_ISBN(book)[0].encode("utf-8")
     
     
     def _get_ISBN(self, book):
         """
         Extracts the ISBN.
         """
-        return self._get_editorial_and_ISBN(book)[1].strip()
+        return self._get_editorial_and_ISBN(book)[1].strip().encode("utf-8")
     
     
     def _get_price(self, book):
@@ -125,7 +127,7 @@ class BookScraper():
         Extracts the book price.
         """
         # TODO: El formato sale con muchos espacios.
-        return book.find(class_="book-price").contents[1].contents[0]
+        return book.find(class_="book-price").contents[1].contents[0].encode("utf-8")
     
     
     def _get_price_no_taxes(self, book):
@@ -133,7 +135,14 @@ class BookScraper():
         Extracts the book price without taxes.
         """
         # TODO: El formato sale con muchos espacios.
-        return book.find(class_="book-price").contents[2]
+        return book.find(class_="book-price").contents[2].encode("utf-8")
+
+
+    def _format_field(self, str):
+        """
+        Trims and format the string given properly
+        """
+        return re.sub("b\\n\s*", "", str, 2)
 
 
     def scrape(self):
@@ -171,4 +180,5 @@ class BookScraper():
             writer = csv.DictWriter(csvfile, fieldnames = self._dt[0].keys())
             writer.writeheader()
             writer.writerows(self._dt)
-            # TODO, sale el siguiente error: 'charmap' codec can't encode character '\u2212' in position 365: character maps to <undefined>
+            # TODO. He añadido un "encode('utf-8)" ha cada método para evitar un error que aparecía al codificar
+            # un símbolo menos ("-"). Aun así, ahora tampoco queda bien: todas las letras con tildes quedan sin codificar.
