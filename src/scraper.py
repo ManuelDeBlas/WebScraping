@@ -30,6 +30,7 @@ class BookScraper():
         """
         Gets pages links
         """
+        # TODO: Reacer para los casos con más de 10 paginas.
         pages_urls = []
         page_items = soup.findAll('a', attrs={'class': 'page-link'})
         # Deleting last item corresponding to the (next_page button)
@@ -105,7 +106,6 @@ class BookScraper():
         """
         img = book.find(class_="book-image col-3 col-sm-3 col-md-2")
         return img.a.img['src']
-
 
     def _get_books(self, soup):
         """
