@@ -3,15 +3,29 @@ from bs4 import BeautifulSoup
 import time
 import csv
 import re
+import string
 
 
 class BookScraper():
     _id = 0
     _dt = []
+    _headers = {
+            "Accept": "text/html,application/xhtml+xml,\
+                application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate, sdch, br",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Cache-Control": "no-cache",
+            "dnt": "1",
+            "Pragma": "no-cache",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) \
+                AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 \
+                Safari/537.36"
+            }
 
     def __init__(self, url="https://www.todostuslibros.com/mas_vendidos"):
 
-        self._url = url
+        self.url = url
 
     @classmethod
     def _generate_unique_id(cls, value):
@@ -24,20 +38,28 @@ class BookScraper():
         """
         Gets an html from a url given.
         """
-        return requests.get(url)
+        return requests.get(url, headers=self._headers)
 
     def _get_pages_links(self, soup):
         """
         Gets pages links
         """
-        # TODO: Reacer para los casos con más de 10 paginas.
         pages_urls = []
         page_items = soup.findAll('a', attrs={'class': 'page-link'})
         # Deleting last item corresponding to the (next_page button)
         page_items.pop()
-        for item in page_items:
-            # Obtaining links for all the pages
-            pages_urls.append(item.attrs['href'])
+
+        # Obtaining last page
+        last_p = page_items.pop()
+        max_p = int(last_p.contents[0])
+
+        # Obtaining link
+        full_link = last_p.attrs['href']
+        link = full_link.rstrip(string.digits)
+
+        for i in range(1, max_p + 1):
+            # Obtaining list of links for all the pages
+            pages_urls.append(link + str(i))
 
         return pages_urls
 
@@ -104,6 +126,7 @@ class BookScraper():
         """
         Extract book image
         """
+        # TODO: Representa que con extraer el link es suficiente?
         img = book.find(class_="book-image col-3 col-sm-3 col-md-2")
         return img.a.img['src']
 
@@ -115,6 +138,7 @@ class BookScraper():
         books = soup.find_all(class_="book row")
 
         for book in books:
+            # self._get_book_url(book)
             self._generate_unique_id(1)
             book_info = {"id": self._id,
                          "title": self._get_title(book),
@@ -134,18 +158,17 @@ class BookScraper():
         """
         Scraps the web.
         """
-        print("Web Scraping of books data from {} ".format(self._url) +
+        print("Web Scraping of books data from {} ".format(self.url) +
               "This process could take about x minutes.\n")
 
         # Start timer
         start_time = time.time()
 
-        # Get info from first page
-        html_page = self._get_html(self._url)
+        # Get main page
+        html_page = self._get_html(self.url)
         soup = BeautifulSoup(html_page.content, features="html.parser")
-        self._get_books(soup)
 
-        # Loop through all remaining pages
+        # Loop through all pages and get their relevant content
         for page in self._get_pages_links(soup):
 
             html_page = self._get_html(page)
