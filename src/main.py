@@ -1,4 +1,4 @@
-from scraper import BookScraper
+from scrape_each_book import BookScraper
 
 output_file = "output/test.csv"
 
