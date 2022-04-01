@@ -38,18 +38,14 @@ class BookScraper():
         """
         Gets an html from a url given.
         """
-        t0 = time.time()
-        r = requests.get(url, headers=self._headers)
-        response_delay = time.time() - t0
-        time.sleep(3 * response_delay)
-        return r
+        return requests.get(url, headers=self._headers)
 
     def _get_book_url(self, book_row):
         """
         Gets book url
         """
         book_url = book_row.find(class_="title").a['href']
-        print(book_url)
+        return book_url
 
     def _get_pages_links(self, soup):
         """
@@ -141,16 +137,14 @@ class BookScraper():
         img = book.find(class_="book-image col-3 col-sm-3 col-md-2")
         return img.a.img['src']
 
-    def _get_books(self, soup):
+    def _get_books(self, soup, delay):
         """
         Extracts the information from all books.
         """
         book_info = dict()
         books = soup.find_all(class_="book row")
-        print(books)
 
         for book in books:
-            print(book)
             # Get book url
             book_url = self._get_book_url(book)
             html_page = self._get_html(book_url)
@@ -159,20 +153,24 @@ class BookScraper():
             # Increase unique id by modifiying private variable _id
             self._generate_unique_id(1)
 
-            
+            book_info = {"id": self._id}
+            # TODO: Reescribir las funciones de abajo para que extraigan la información de la pagina del libro.
+            """
             book_info = {"id": self._id,
                          "title": self._get_title(soup),
-                         #"subtitle": self._get_subtitle(soup),
-                         #"author": self._get_author(soup),
-                         #"synopsis": self._get_synopsis(soup),
-                         #"editorial": self._get_editorial_and_ISBN(soup)[0],
-                         #"ISBN": self._get_editorial_and_ISBN(soup)[1],
-                         #"price (€)": self._get_price(soup),
-                         #"untaxed price (€)": self._get_price_no_taxes(soup),
-                         #"book cover": self._get_book_image(soup)
+                         "subtitle": self._get_subtitle(soup),
+                         "author": self._get_author(soup),
+                         "synopsis": self._get_synopsis(soup),
+                         "editorial": self._get_editorial_and_ISBN(soup)[0],
+                         "ISBN": self._get_editorial_and_ISBN(soup)[1],
+                         "price (€)": self._get_price(soup),
+                         "untaxed price (€)": self._get_price_no_taxes(soup),
+                         "book cover": self._get_book_image(soup)
                          }
-            
+            """
             self._dt.append(book_info)
+            # Force delay between html requests:
+            time.sleep(10 * delay)
 
     def scrape(self):
         """
@@ -186,16 +184,19 @@ class BookScraper():
 
         # Get main page
         html_page = self._get_html(self.url)
+
+        # Obtain the response delay of a html request
+        response_delay = time.time() - start_time
+
         soup = BeautifulSoup(html_page.content, features="html.parser")
-        self._get_books(soup)
-        
+        self._get_books(soup, response_delay)
+        """
         # Loop through all pages and get their relevant content
         for page in self._get_pages_links(soup):
-
             html_page = self._get_html(page)
             soup = BeautifulSoup(html_page.content, features="html.parser")
             self._get_books(soup)
-        
+        """
 
     def data2csv(self, output_file):
         """
