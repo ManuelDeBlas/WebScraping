@@ -145,20 +145,29 @@ class BookScraper():
         books = soup.find_all(class_="book row")
 
         for book in books:
-            # self._get_book_url(book)
-            self._generate_unique_id(1)
-            book_info = {"id": self._id,
-                         "title": self._get_title(book),
-                         "subtitle": self._get_subtitle(book),
-                         "author": self._get_author(book),
-                         "synopsis": self._get_synopsis(book),
-                         "editorial": self._get_editorial_and_ISBN(book)[0],
-                         "ISBN": self._get_editorial_and_ISBN(book)[1],
-                         "price (€)": self._get_price(book),
-                         "untaxed price (€)": self._get_price_no_taxes(book),
-                         "book cover": self._get_book_image(book)
-                         }
+            # Get book url
+            book_url = self._get_book_url(book)
+            html_page = self._get_html(book_url)
+            soup = BeautifulSoup(html_page.content, features="html.parser")
 
+            # Increase unique id by modifiying private variable _id
+            self._generate_unique_id(1)
+
+            book_info = {"id": self._id}
+            # TODO: Reescribir las funciones de abajo para que extraigan la información de la pagina del libro.
+            """
+            book_info = {"id": self._id,
+                         "title": self._get_title(soup),
+                         "subtitle": self._get_subtitle(soup),
+                         "author": self._get_author(soup),
+                         "synopsis": self._get_synopsis(soup),
+                         "editorial": self._get_editorial_and_ISBN(soup)[0],
+                         "ISBN": self._get_editorial_and_ISBN(soup)[1],
+                         "price (€)": self._get_price(soup),
+                         "untaxed price (€)": self._get_price_no_taxes(soup),
+                         "book cover": self._get_book_image(soup)
+                         }
+            """
             self._dt.append(book_info)
 
     def scrape(self):
@@ -174,13 +183,15 @@ class BookScraper():
         # Get main page
         html_page = self._get_html(self.url)
         soup = BeautifulSoup(html_page.content, features="html.parser")
-
+        self._get_books(soup)
+        """
         # Loop through all pages and get their relevant content
         for page in self._get_pages_links(soup):
 
             html_page = self._get_html(page)
             soup = BeautifulSoup(html_page.content, features="html.parser")
             self._get_books(soup)
+        """
 
     def data2csv(self, output_file):
         """
