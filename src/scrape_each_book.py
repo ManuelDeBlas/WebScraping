@@ -45,7 +45,7 @@ class BookScraper():
         Gets book url
         """
         book_url = book_row.find(class_="title").a['href']
-        print(book_url)
+        return book_url
 
     def _get_pages_links(self, soup):
         """
@@ -137,7 +137,7 @@ class BookScraper():
         img = book.find(class_="book-image col-3 col-sm-3 col-md-2")
         return img.a.img['src']
 
-    def _get_books(self, soup):
+    def _get_books(self, soup, delay):
         """
         Extracts the information from all books.
         """
@@ -169,6 +169,8 @@ class BookScraper():
                          }
             """
             self._dt.append(book_info)
+            # Force delay between html requests:
+            time.sleep(10 * delay)
 
     def scrape(self):
         """
@@ -182,8 +184,12 @@ class BookScraper():
 
         # Get main page
         html_page = self._get_html(self.url)
+
+        # Obtain the response delay of a html request
+        response_delay = time.time() - start_time
+
         soup = BeautifulSoup(html_page.content, features="html.parser")
-        self._get_books(soup)
+        self._get_books(soup, response_delay)
         """
         # Loop through all pages and get their relevant content
         for page in self._get_pages_links(soup):
