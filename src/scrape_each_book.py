@@ -213,7 +213,7 @@ class BookScraper():
             binding = ""
         return binding
 
-    def _get_book_feature(book, c1, c2):
+    def _get_book_feature(self, book, c1, c2):
         """
         Extracts a book feature for 2 parameters given. The parameters depend on the feature to look for.
 
