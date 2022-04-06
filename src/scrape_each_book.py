@@ -345,7 +345,7 @@ class BookScraper():
         Scrapes the web.
         """
         print("Web Scraping of books data from {} ".format(self.url) +
-              "This process could take about x minutes.\n")
+              "This process could take about 20 minutes.\n")
 
         # Start timer
         start_time = time.time()
