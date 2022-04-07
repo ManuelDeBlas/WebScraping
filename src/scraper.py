@@ -6,7 +6,8 @@ import re
 import string
 
 
-class BookScraper():
+class FastBookScraper():
+    _url = "https://www.todostuslibros.com/mas_vendidos"
     _id = 0
     _dt = []
     _headers = {
@@ -23,9 +24,8 @@ class BookScraper():
                 Safari/537.36"
             }
 
-    def __init__(self, url="https://www.todostuslibros.com/mas_vendidos"):
-
-        self.url = url
+    def __init__(self):
+        pass
 
     @classmethod
     def _generate_unique_id(cls, value):
@@ -80,6 +80,7 @@ class BookScraper():
 
         except IndexError:
             subtitle = ""
+
         return subtitle.strip()
 
     def _get_author(self, book):
@@ -88,15 +89,6 @@ class BookScraper():
         """
         autor = book.find(class_="author").contents[0].contents[0]
         return autor.strip()
-
-    def _get_synopsis(self, book):
-        """
-        Extracts the book synopsis.
-        """
-        # TODO: Descartarlo? las sinopsis completas ocupan demasiado
-        return book.find(
-            class_="synopsis d-none d-md-block " +
-            "d-lg-block d-xl-block").contents[0]
 
     def _get_editorial_and_ISBN(self, book):
         """
@@ -138,13 +130,11 @@ class BookScraper():
         books = soup.find_all(class_="book row")
 
         for book in books:
-            # self._get_book_url(book)
             self._generate_unique_id(1)
             book_info = {"id": self._id,
                          "title": self._get_title(book),
                          "subtitle": self._get_subtitle(book),
                          "author": self._get_author(book),
-                         "synopsis": self._get_synopsis(book),
                          "editorial": self._get_editorial_and_ISBN(book)[0],
                          "ISBN": self._get_editorial_and_ISBN(book)[1],
                          "price (€)": self._get_price(book),
@@ -158,14 +148,14 @@ class BookScraper():
         """
         Scraps the web.
         """
-        print("Web Scraping of books data from {} ".format(self.url) +
-              "This process could take about x minutes.\n")
+        print("Web Scraping of books data from {} ".format(self._url) +
+              "This process could take about 2 minutes.\n")
 
         # Start timer
         start_time = time.time()
 
         # Get main page
-        html_page = self._get_html(self.url)
+        html_page = self._get_html(self._url)
         soup = BeautifulSoup(html_page.content, features="html.parser")
 
         # Loop through all pages and get their relevant content

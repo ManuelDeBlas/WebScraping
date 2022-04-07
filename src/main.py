@@ -1,37 +1,38 @@
+from pickle import TRUE
 from scrape_each_book import BookScraper
+from scraper import FastBookScraper
 import argparse
 
 
-def main(output_file, keyword):
+def main(output_file, fast):
     """
     Scrape todostuslibros website
     """
-    if(keyword != ""):
-        scraper = BookScraper(
-            "https://www.todostuslibros.com/busquedas?keyword=" +
-            keyword)
+    if (fast == "TRUE"):
+        scraper = FastBookScraper()
     else:
         scraper = BookScraper()
+
     scraper.scrape()
     scraper.data2csv(output_file)
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Seleccione una busqueda \
-        a realizar.')
-    parser.add_argument('-k', '--keyword', type=str, default="",
-                        help='Palabra clabe que se quiere \
-                            usar para la busqueda')
+    parser = argparse.ArgumentParser(description='Escoja el metodo de \
+        ejecución o el path al fichero de salida.')
+    parser.add_argument('-f', '--fast', type=str, default="TRUE",
+                        help="TRUE - Utiliza una version rapida que obtiene \
+                            solo los datos más importantes, FALSE - Utiliza \
+                            una version más lenta que obtiene todos los datos.\
+                            Por defecto es TRUE")
     parser.add_argument('-o', '--output_filepath', type=str,
                         default="output/test.csv",
-                        help='FilePath al fichero de salida')
+                        help='FilePath al fichero de salida. Por defecto es \
+                            output/Fast_Bestsellers')
     args = parser.parse_args()
 
     output_file = args.output_filepath
-    keyword = args.keyword
+    fast = args.fast
 
-    if(" " in keyword):
-        keyword = keyword.replace(" ", "+")
-
-    main(output_file, keyword)
+    main(output_file, fast)
