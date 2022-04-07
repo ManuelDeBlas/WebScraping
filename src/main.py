@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Escoja el metodo de \
         ejecución o el path al fichero de salida.')
-    parser.add_argument('-f', '--fast', type=str, default="TRUE",
+    parser.add_argument('-f', '--fast', type=str, default="FALSE",
                         help="TRUE - Utiliza una version rapida que obtiene \
                             solo los datos más importantes. \
                             FALSE - Utiliza una version más lenta que obtiene \
