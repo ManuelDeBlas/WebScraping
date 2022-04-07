@@ -4,7 +4,7 @@ from scraper import FastBookScraper
 import argparse
 
 
-def main(output_file, fast):
+def main(output_file, fast, covers_path):
     """
     Scrape todostuslibros website
     """
@@ -15,6 +15,9 @@ def main(output_file, fast):
 
     scraper.scrape()
     scraper.data2csv(output_file)
+
+    if (covers_path != ""):
+        scraper.download_covers(output_file, covers_path)
 
 
 if __name__ == "__main__":
@@ -31,9 +34,15 @@ if __name__ == "__main__":
                         default="output/test.csv",
                         help='FilePath al fichero de salida. Por defecto es \
                             output/Fast_Bestsellers.csv')
+    parser.add_argument('-d', '--download', type=str,
+                        default="output/book_covers",
+                        help='Path a la carpeta donde descargar las imagenes \
+                            de las cubiertas de los libros. Si el campo esta \
+                            vacío no se descargaran las imagenes')
     args = parser.parse_args()
 
     output_file = args.output_filepath
     fast = args.fast
+    covers_path = args.download
 
-    main(output_file, fast)
+    main(output_file, fast, covers_path)

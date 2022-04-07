@@ -4,19 +4,22 @@ import time
 import csv
 import re
 import string
+import pandas as pd
 
 
 class BookScraper():
     """
-    A class that scrapes the website todostuslibros.
+    A class that scrapes the website todostuslibros.com/mas_vendidos.
 
     Attributes:
         This class does not have public attributes
 
     Methods:
-        scrape (): Scrapes the website
-        data2csv (output_file): Creates and stores collected data into a csv \
-                                in the given file path.
+        scrape(): Scrapes the website
+        data2csv(output_file): Creates and stores collected data into a csv \
+                            in the given file path.
+        download_covers(input_file, output_folder): Downloads and stores book \
+                                                    covers.
         """
     _url = "https://www.todostuslibros.com/mas_vendidos"
     _id = 0
@@ -391,7 +394,7 @@ class BookScraper():
 
     def scrape(self):
         """
-        Scrapes the web.
+        Scrapes the website.
         """
         print("Web Scraping of books data from {} ".format(self._url) +
               "This process could take about 20 minutes.\n")
@@ -424,3 +427,24 @@ class BookScraper():
             writer = csv.DictWriter(csvfile, fieldnames=self._dt[0].keys())
             writer.writeheader()
             writer.writerows(self._dt)
+
+    def download_covers(self, input_filepath, output_folder):
+        """
+        Downloads and stores book covers images.
+
+        Parameters:
+            input_filepath (string): Filepath to scraped csv.
+            output_folder (string): Path to the folder where \
+                                    images will be stored.
+        """
+        df = pd.read_csv(input_filepath, usecols=['id', 'book cover'])
+        for i in df.index:
+            html = self._get_html(df["book cover"][i])
+            if html.status_code == 200:
+                output = open(output_folder + '/' + str(df["id"][i]) +
+                              '.gif', "wb")
+
+                for chunk in html:
+                    output.write(chunk)
+
+                output.close()
