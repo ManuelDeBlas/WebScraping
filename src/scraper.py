@@ -8,6 +8,20 @@ import pandas as pd
 
 
 class FastBookScraper():
+    """
+    A class that scrapes the website todostuslibros.com/mas_vendidos faster \
+        but with less information than BookScraper.
+
+    Attributes:
+        This class does not have public attributes
+
+    Methods:
+        scrape(): Scrapes the website
+        data2csv(output_file): Creates and stores collected data into a csv \
+                            in the given file path.
+        download_covers(input_file, output_folder): Downloads and stores book \
+                                                    covers.
+    """
     _url = "https://www.todostuslibros.com/mas_vendidos"
     _id = 0
     _dt = []
@@ -31,19 +45,36 @@ class FastBookScraper():
     @classmethod
     def _generate_unique_id(cls, value):
         """
-        Sums value to class variable _id
+        Sums value to class variable _id.
+
+        Parameters:
+            value (int): The value of the last id
         """
         cls._id += value
 
     def _get_html(self, url):
         """
         Gets an html from a url given.
+
+        Parameters:
+            url (string): The url of the website the html is extracted
+
+        Returns:
+            The html from the url given
         """
         return requests.get(url, headers=self._headers)
 
     def _get_pages_links(self, soup):
         """
-        Gets pages links
+        Gets pages links from an html given.
+
+        Parameters:
+            soup (object 'bs4.BeautifulSoup'): An html object of the \
+                                               first group of books.
+
+        Returns:
+            pages_urls (list): A list of the different url from all the \
+                               pages where are books.
         """
         pages_urls = []
         page_items = soup.findAll('a', attrs={'class': 'page-link'})
@@ -66,7 +97,14 @@ class FastBookScraper():
 
     def _get_title(self, book):
         """
-        Extracts the book title and gives it format.
+        Extracts the book title.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a \
+                                               book in html
+
+        Returns:
+            title (string): The title of the book given
         """
         title = book.find(class_="title").contents[1].contents[0]
         return title.strip()
@@ -74,6 +112,13 @@ class FastBookScraper():
     def _get_subtitle(self, book):
         """
         Extracts the book subtitle.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a book \
+                                               in html
+
+        Returns:
+            subtitle (string): The subtitle of the book given
         """
         # There might be no subtitles
         try:
@@ -87,13 +132,27 @@ class FastBookScraper():
     def _get_author(self, book):
         """
         Extracts the book author.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a \
+                                               book in html
+
+        Returns:
+            author (string): The author of the book given
         """
         autor = book.find(class_="author").contents[0].contents[0]
         return autor.strip()
 
     def _get_editorial_and_ISBN(self, book):
         """
-        Returns the editorial and the ISBN in a list.
+        Extracts the book editorial and ISBN.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a \
+                                               book in html
+
+        Returns:
+            ed_isbn (list): The editorial and ISBN of the book
         """
         ed_isbn = book.find(class_="data").contents[0].split("/")
         # Deleting all unwanted whitespcaes
@@ -102,6 +161,13 @@ class FastBookScraper():
     def _get_price(self, book):
         """
         Extracts the book price.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a \
+                                               book in html
+
+        Returns:
+            price (list): The price of the book given
         """
         price = book.find(class_="book-price").contents[1].contents[0]
         # Digits are extracted from the string
@@ -110,6 +176,13 @@ class FastBookScraper():
     def _get_price_no_taxes(self, book):
         """
         Extracts the book price without taxes.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a \
+                                               book in html
+
+        Returns:
+            untaxed price (list): The price without taxes of the book given
         """
         untaxed = book.find(class_="book-price").contents[2]
         # Digits are extracted from the string
@@ -117,7 +190,14 @@ class FastBookScraper():
 
     def _get_book_image(self, book):
         """
-        Extract book image
+        Extracts the book cover.
+
+        Parameters:
+            book (object 'bs4.BeautifulSoup'): The information of a \
+                                               book in html
+
+        Returns:
+            cover (string): The url of the cover's picture
         """
         # TODO: Representa que con extraer el link es suficiente?
         img = book.find(class_="book-image col-3 col-sm-3 col-md-2")
@@ -125,7 +205,11 @@ class FastBookScraper():
 
     def _get_books(self, soup):
         """
-        Extracts the information from all books.
+        Extracts the information from all books and appends them to the object.
+
+        Parameters:
+            soup (object 'bs4.BeautifulSoup'): An html of a page of different \
+                                               books given
         """
         book_info = dict()
         books = soup.find_all(class_="book row")
@@ -147,7 +231,7 @@ class FastBookScraper():
 
     def scrape(self):
         """
-        Scraps the web.
+        Scrapes the website.
         """
         print("Web Scraping of books data from {} ".format(self._url) +
               "This process could take about 2 minutes.\n")
@@ -169,6 +253,9 @@ class FastBookScraper():
     def data2csv(self, output_file):
         """
         Turns the data into a csv file to the path given.
+
+        Parameters:
+            output_file (string): File path for the output.
         """
         with open(output_file, 'w', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=self._dt[0].keys())

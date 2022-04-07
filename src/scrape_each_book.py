@@ -212,7 +212,19 @@ class BookScraper():
 
         return editorial
 
-    def _get_conditional_feature(self, conditional_features, conditional_values, feature):
+    def _get_conditional_feature(self, conditional_features, \
+        conditional_values, feature):
+        """
+        Extracts the value of a feature if it exists.
+        
+        Parameters:
+            conditional_features (list): List of the book features
+            conditional_values (list): List of book features values
+            feature (string): The specific name of the feature to search
+
+        Returns:
+            value (string): The value of the feature searched
+        """
         try:
             index = conditional_features.index(feature)
             value = conditional_values[index]
