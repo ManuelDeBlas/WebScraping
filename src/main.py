@@ -6,7 +6,7 @@ import argparse
 
 def main(output_file, fast, covers_path):
     """
-    Scrape todostuslibros website
+    Scrape todostuslibros/mas_vendidos website
     """
     if (fast == "TRUE"):
         scraper = FastBookScraper()
