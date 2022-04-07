@@ -212,11 +212,11 @@ class BookScraper():
 
         return editorial
 
-    def _get_conditional_feature(self, conditional_features, \
-        conditional_values, feature):
+    def _get_cond_feature(self, conditional_features,
+                          conditional_values, feature):
         """
         Extracts the value of a feature if it exists.
-        
+
         Parameters:
             conditional_features (list): List of the book features
             conditional_values (list): List of book features values
@@ -228,7 +228,7 @@ class BookScraper():
         try:
             index = conditional_features.index(feature)
             value = conditional_values[index]
-        except:
+        except IndexError:
             value = ""
         return value
 
@@ -321,10 +321,12 @@ class BookScraper():
         Returns:
             book_dict (dict): The book parameters
         """
-        contitional_features = [feature.get_text() for feature in book \
-            .find(class_="col-12 col-sm-12 col-md-12 col-lg-6").dl.find_all("dt")]
-        conditional_values = [value.get_text() for value in book \
-            .find(class_="col-12 col-sm-12 col-md-12 col-lg-6").dl.find_all("dd")]
+        cond_features = [feature.get_text() for feature in book.find
+                         (class_="col-12 col-sm-12 col-md-12 col-lg-6")
+                         .dl.find_all("dt")]
+        cond_values = [value.get_text() for value in book.find
+                       (class_="col-12 col-sm-12 col-md-12 col-lg-6")
+                       .dl.find_all("dd")]
 
         return {"id": self._id,
                 "title": self._get_title(book),
@@ -332,12 +334,18 @@ class BookScraper():
                 "author": self._get_author(book),
                 "matter": self._get_matter(book),
                 "editorial": self._get_editorial(book),
-                "traductor": self._get_conditional_feature(contitional_features, conditional_values, 'Traductor:'),
-                "collection": self._get_conditional_feature(contitional_features, conditional_values, 'Colección:'),
-                "binding": self._get_conditional_feature(contitional_features, conditional_values, 'Encuadernación:'),
-                "country": self._get_conditional_feature(contitional_features, conditional_values, 'País de publicación :'),
-                "lenguage of publication": self._get_conditional_feature(contitional_features, conditional_values, 'Idioma de publicación :'),
-                "original lenguage": self._get_conditional_feature(contitional_features, conditional_values, 'Idioma original :'),
+                "traductor": self._get_cond_feature(
+                    cond_features, cond_values, 'Traductor:'),
+                "collection": self._get_cond_feature(
+                    cond_features, cond_values, 'Colección:'),
+                "binding": self._get_cond_feature(
+                    cond_features, cond_values, 'Encuadernación:'),
+                "country": self._get_cond_feature(
+                    cond_features, cond_values, 'País de publicación :'),
+                "lenguage of publication": self._get_cond_feature(
+                    cond_features, cond_values, 'Idioma de publicación :'),
+                "original lenguage": self._get_cond_feature(
+                    cond_features, cond_values, 'Idioma original :'),
                 "ISBN": self._get_book_feature(book, 3, 2),
                 "EAN": self._get_book_feature(book, 3, 6),
                 "dimension": self._get_book_feature(book, 3, 9),
