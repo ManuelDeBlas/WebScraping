@@ -28,7 +28,7 @@ if __name__ == "__main__":
                             todos los datos.\
                             Por defecto es TRUE")
     parser.add_argument('-o', '--output_filepath', type=str,
-                        default="output/test.csv",
+                        default="output/Fast_Bestsellers.csv",
                         help='FilePath al fichero de salida. Por defecto es \
                             output/Fast_Bestsellers.csv')
     args = parser.parse_args()
