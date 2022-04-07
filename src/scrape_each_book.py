@@ -212,47 +212,13 @@ class BookScraper():
 
         return editorial
 
-    def _get_collection(self, book):
-        """
-        Extracts the book collection.
-
-        Parameters:
-            book (object 'bs4.BeautifulSoup'): The information of a \
-                                               book in html
-
-        Returns:
-            collection (string): The collection of the book given
-        """
+    def _get_conditional_feature(self, conditional_features, conditional_values, feature):
         try:
-            collection = book.find(class_="col-12 col-sm-12").contents[3] \
-                .contents[1].contents[1].contents[6].contents[0].strip()
-        except IndexError:
-            collection = ""
-        except AttributeError:
-            collection = ""
-
-        return collection
-
-    def _get_binding(self, book):
-        """
-        Extracts the book binding.
-
-        Parameters:
-            book (object 'bs4.BeautifulSoup'): The information of \
-                                               a book in html
-
-        Returns:
-            binding (string): The binding of the book given
-        """
-        try:
-            binding = book.find(class_="col-12 col-sm-12").contents[3] \
-                .contents[1].contents[1].contents[9].contents[0].strip()
-        except IndexError:
-            binding = ""
-        except AttributeError:
-            binding = ""
-
-        return binding
+            index = conditional_features.index(feature)
+            value = conditional_values[index]
+        except:
+            value = ""
+        return value
 
     def _get_book_feature(self, book, c1, c2):
         """
@@ -343,17 +309,23 @@ class BookScraper():
         Returns:
             book_dict (dict): The book parameters
         """
+        contitional_features = [feature.get_text() for feature in book \
+            .find(class_="col-12 col-sm-12 col-md-12 col-lg-6").dl.find_all("dt")]
+        conditional_values = [value.get_text() for value in book \
+            .find(class_="col-12 col-sm-12 col-md-12 col-lg-6").dl.find_all("dd")]
+
         return {"id": self._id,
                 "title": self._get_title(book),
                 "subtitle": self._get_subtitle(book),
                 "author": self._get_author(book),
                 "matter": self._get_matter(book),
                 "editorial": self._get_editorial(book),
-                "collection": self._get_collection(book),
-                "binding": self._get_binding(book),
-                "country": self._get_book_feature(book, 1, 12),
-                "lenguage of publication": self._get_book_feature(book, 1, 15),
-                "original lenguage": self._get_book_feature(book, 1, 18),
+                "traductor": self._get_conditional_feature(contitional_features, conditional_values, 'Traductor:'),
+                "collection": self._get_conditional_feature(contitional_features, conditional_values, 'Colección:'),
+                "binding": self._get_conditional_feature(contitional_features, conditional_values, 'Encuadernación:'),
+                "country": self._get_conditional_feature(contitional_features, conditional_values, 'País de publicación :'),
+                "lenguage of publication": self._get_conditional_feature(contitional_features, conditional_values, 'Idioma de publicación :'),
+                "original lenguage": self._get_conditional_feature(contitional_features, conditional_values, 'Idioma original :'),
                 "ISBN": self._get_book_feature(book, 3, 2),
                 "EAN": self._get_book_feature(book, 3, 6),
                 "dimension": self._get_book_feature(book, 3, 9),
