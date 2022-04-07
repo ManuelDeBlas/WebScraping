@@ -24,16 +24,16 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Escoja el metodo de \
         ejecución o el path al fichero de salida.')
-    parser.add_argument('-f', '--fast', type=str, default="FALSE",
+    parser.add_argument('-f', '--fast', type=str, default="TRUE",
                         help="TRUE - Utiliza una version rapida que obtiene \
                             solo los datos más importantes. \
                             FALSE - Utiliza una version más lenta que obtiene \
                             todos los datos.\
                             Por defecto es TRUE")
     parser.add_argument('-o', '--output_filepath', type=str,
-                        default="output/Fast_Bestsellers.csv",
+                        default="output/Bestsellers.csv",
                         help='FilePath al fichero de salida. Por defecto es \
-                            output/Fast_Bestsellers.csv')
+                            output/Bestsellers.csv')
     parser.add_argument('-d', '--download', type=str,
                         default="output/book_covers",
                         help='Path a la carpeta donde descargar las imagenes \
