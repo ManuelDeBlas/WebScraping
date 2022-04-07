@@ -430,7 +430,8 @@ class BookScraper():
 
     def download_covers(self, input_filepath, output_folder):
         """
-        Downloads and stores book covers images.
+        Downloads and stores book covers images giving them their book \
+        id as filename.
 
         Parameters:
             input_filepath (string): Filepath to scraped csv.

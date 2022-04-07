@@ -4,6 +4,7 @@ import time
 import csv
 import re
 import string
+import pandas as pd
 
 
 class FastBookScraper():
@@ -173,3 +174,25 @@ class FastBookScraper():
             writer = csv.DictWriter(csvfile, fieldnames=self._dt[0].keys())
             writer.writeheader()
             writer.writerows(self._dt)
+
+    def download_covers(self, input_filepath, output_folder):
+        """
+        Downloads and stores book covers images giving them their book \
+        id as filename.
+
+        Parameters:
+            input_filepath (string): Filepath to scraped csv.
+            output_folder (string): Path to the folder where \
+                                    images will be stored.
+        """
+        df = pd.read_csv(input_filepath, usecols=['id', 'book cover'])
+        for i in df.index:
+            html = self._get_html(df["book cover"][i])
+            if html.status_code == 200:
+                output = open(output_folder + '/' + str(df["id"][i]) +
+                              '.gif', "wb")
+
+                for chunk in html:
+                    output.write(chunk)
+
+                output.close()
