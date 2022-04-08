@@ -35,7 +35,7 @@ if __name__ == "__main__":
                         help='FilePath al fichero de salida. Por defecto es \
                             output/Bestsellers.csv')
     parser.add_argument('-d', '--download', type=str,
-                        default="output/book_covers",
+                        default="",
                         help='Path a la carpeta donde descargar las imagenes \
                             de las cubiertas de los libros. Si el campo esta \
                             vacío no se descargaran las imagenes')
