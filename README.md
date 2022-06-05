@@ -1,4 +1,4 @@
-# Práctica 1: Proyecto Analítico
+# Práctica 2: Proyecto Analítico
 
 ## Descripción
 
